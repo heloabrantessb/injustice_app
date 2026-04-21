@@ -23,6 +23,7 @@ class CharactersViewModel {
       createCharacterCommand: CreateCharacterCommand(facade),
      );
   }
+  
    // --- Comandos expostos ---
   GetAllCharactersCommand get getAllCharactersCommand =>
       commands.getAllCharactersCommand; 

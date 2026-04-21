@@ -5,8 +5,7 @@ import '../../core/typedefs/types_defs.dart';
 import '../../domain/facades/character_facade_usecases_interface.dart';
 import '../../domain/models/character_entity.dart';
 
-final class CreateCharacterCommand
-    extends ParameterizedCommand<Character, Failure, CharacterParams> {
+final class CreateCharacterCommand extends ParameterizedCommand<Character, Failure, CharacterParams> {
   
   final ICharacterFacadeUseCases _characterFacadeUseCases;
 
