@@ -14,9 +14,27 @@ final class CharacterSharedPreferencesService
   static const String _storageKey = 'characters';
 
   @override
-  Future<CharacterResult> deleteCharacter(String id) {
-    // TODO: implement deleteCharacter
-    throw UnimplementedError();
+  Future<CharacterResult> deleteCharacter(String id) async{
+    try {
+      final currentResult = await getAllCharacters();
+      return await currentResult.fold(
+        onSuccess: (characters) async {
+          final character = characters.firstWhere((char) => char.id == id);
+          final updatedCharacters =
+              characters.where((char) => char.id != id).toList();
+          await _saveCharacters(updatedCharacters);
+          return Success(character);
+        },
+        onFailure: (failure) async {
+          return Error(ApiLocalFailure('Erro ao obter personagens'));
+        },
+      );
+    }catch (e) {
+      return Error(
+        ApiLocalFailure('Shared Preferences - Erro ao deletar personagem: $e'),
+      );
+    }
+
   }
 
   @override
@@ -44,9 +62,24 @@ final class CharacterSharedPreferencesService
   }
 
   @override
-  Future<CharacterResult> getCharacterById(String id) {
-    // TODO: implement getCharacterById
-    throw UnimplementedError();
+  Future<CharacterResult> getCharacterById(String id) async {
+    try {
+      final currentResult = await getAllCharacters();
+      return await currentResult.fold(
+        onSuccess: (characters) async {
+          final character = characters.firstWhere((char) => char.id == id);
+          return Success(character);
+        },
+        onFailure: (failure) async {
+          return Error(ApiLocalFailure('Erro ao obter personagem'));
+        },
+      );
+    } catch (e) {
+      return Error(
+        ApiLocalFailure('Shared Preferences - Erro ao obter personagem: $e'),
+      );
+
+    }
   }
 
   @override
