@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../domain/models/account_entity.dart';
 import '../../../../../domain/models/character_entity.dart';
@@ -63,8 +65,9 @@ class CharactersBody extends StatelessWidget {
                     final character = characters[index];
                     return CharacterListItem(
                       character: character,
-                      onDelete: () {},
-                      onTap: () {},
+                      onDelete: () => viewModel.commands.deleteCharacter(character.id),
+                      onEdit: () => context.push(AppPaths.characterEdit, extra: character),
+                      onTap: () => context.push(AppPaths.characterDetail, extra: character),
                     );
                   }, childCount: characters.length),
                 ),
@@ -121,12 +124,14 @@ class CharactersBody extends StatelessWidget {
 class CharacterListItem extends StatelessWidget {
   final Character character;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
   final VoidCallback onTap;
 
   const CharacterListItem({
     super.key,
     required this.character,
     required this.onDelete,
+    required this.onEdit,
     required this.onTap,
   });
 
@@ -156,7 +161,7 @@ class CharacterListItem extends StatelessWidget {
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          onTap();
+          onEdit();
           return false;
         } else {
           return await showDialog<bool>(

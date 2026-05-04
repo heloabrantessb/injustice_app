@@ -110,6 +110,35 @@ final class CharacterSharedPreferencesService
     }
   }
 
+  @override
+  Future<CharacterResult> updateCharacter(Character character) async {
+    try {
+      final currentResult = await getAllCharacters();
+
+      return await currentResult.fold(
+        onSuccess: (characters) async {
+          final index = characters.indexWhere((char) => char.id == character.id);
+
+          if (index < 0) {
+            return Error(ApiLocalFailure('Personagem não encontrado para atualização.'));
+          }
+
+          final updatedCharacters = [...characters];
+          updatedCharacters[index] = character;
+          await _saveCharacters(updatedCharacters);
+          return Success(character);
+        },
+        onFailure: (failure) async {
+          return Error(ApiLocalFailure('Erro ao obter personagens'));
+        },
+      );
+    } catch (e) {
+      return Error(
+        ApiLocalFailure('Shared Preferences - Erro ao atualizar personagem: $e'),
+      );
+    }
+  }
+
   /// Salva os personagens no storage
   Future<void> _saveCharacters(List<Character> characters) async {
     try {

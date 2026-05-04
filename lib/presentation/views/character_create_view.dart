@@ -353,7 +353,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
     required String label,
     required T value,
     required List<T> items,
-    required ValueChanged<T>? onChanged,
+    required ValueChanged<T?> onChanged,
     required String Function(T) displayName,
     required IconData icon,
   }) {

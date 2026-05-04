@@ -193,27 +193,44 @@ class _HomeViewState extends State<HomeView> {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Botão para ver personagens
             Center(
-              child: FilledButton.icon(
-                 onPressed: () {
-                  final account = _vmAccount.accountState.state.value;
-                  if (account != null) {
-                    context.goNamed(
-                      AppRouteNames.characters,
-                      extra: account,
-                    );
-                  }
-                },
-                // onPressed: () => context.push(AppRoutes.personagens),
-                icon: const Icon(Icons.people),
-                label: const Text('Ver Meus Personagens'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xl,
-                    vertical: AppSpacing.md,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  FilledButton.icon(
+                    onPressed: () {
+                      final account = _vmAccount.accountState.state.value;
+                      if (account != null) {
+                        context.goNamed(
+                          AppRouteNames.characters,
+                          extra: account,
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.people),
+                    label: const Text('Ver Meus Personagens'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.md),
+                  FilledButton.icon(
+                    onPressed: () {
+                      context.goNamed(AppRouteNames.accountCreate);
+                    },
+                    icon: const Icon(Icons.edit),
+                    label: const Text('Editar Conta'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

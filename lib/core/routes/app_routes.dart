@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 
 import '../../domain/models/account_entity.dart';
+import '../../domain/models/character_entity.dart';
 import '../../presentation/views/about_view.dart';
 import '../../presentation/views/account_create_view.dart';
 import '../../presentation/views/characters/character_create_view.dart';
+import '../../presentation/views/characters/character_detail_view.dart';
 import '../../presentation/views/characters/list_of/characters_view.dart';
 import '../../presentation/views/home_view.dart';
 
@@ -14,6 +16,8 @@ class AppRouteNames {
   static const accountCreate = 'account_create';
   static const characters = 'characters';
   static const characterCreate = 'character_create';
+  static const characterDetail = 'character_detail';
+  static const characterEdit = 'character_edit';
 }
 
 /// Paths to keep URL structure consistent
@@ -23,6 +27,8 @@ class AppPaths {
   static const accountCreate = '/account-create';
   static const characters = '/characters';
   static const characterCreate = '/character-create';
+  static const characterDetail = '/character-detail';
+  static const characterEdit = '/character-edit';
 }
 
 /// app routers using go_router
@@ -57,6 +63,25 @@ class AppRouter {
         name: AppRouteNames.characterCreate,
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: CharacterCreateView()),
+      ),
+      GoRoute(
+        path: AppPaths.characterDetail,
+        name: AppRouteNames.characterDetail,
+        pageBuilder: (context, state) {
+          final character = state.extra is Character ? state.extra as Character : null;
+          if (character == null) {
+            return const NoTransitionPage(child: CharacterCreateView());
+          }
+          return NoTransitionPage(child: CharacterDetailView(character: character));
+        },
+      ),
+      GoRoute(
+        path: AppPaths.characterEdit,
+        name: AppRouteNames.characterEdit,
+        pageBuilder: (context, state) {
+          final character = state.extra is Character ? state.extra as Character : null;
+          return NoTransitionPage(child: CharacterCreateView(initialCharacter: character));
+        },
       ),
       GoRoute(
         path: AppPaths.about,

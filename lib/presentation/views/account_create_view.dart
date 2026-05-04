@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/di/dependency_injection.dart';
-import '../../core/failure/failure.dart';
-import '../../core/messages/app_messages.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/typedefs/types_defs.dart';
 import '../../core/validators/email_str_validator.dart';
 import '../../core/validators/empty_str_validator.dart';
-import '../../core/validators/text_field_validator.dart';
 import '../../domain/models/account_entity.dart';
 import '../controllers/account_state_viewmodel.dart';
 import '../controllers/account_viewmodel.dart';
@@ -295,13 +292,18 @@ class _AccountCreateViewState extends State<AccountCreateView> {
                 //   textAlign: TextAlign.center,
                 // ),
                 // const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Preencha os dados abaixo para criar sua conta',
-                  style: context.textStyles.bodyMedium?.withColor(
-                    Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                Watch((_) {
+                  final isEditing = _vmAccount.accountState.isEditing.value;
+                  return Text(
+                    isEditing
+                        ? 'Atualize os dados abaixo para editar sua conta'
+                        : 'Preencha os dados abaixo para criar sua conta',
+                    style: context.textStyles.bodyMedium?.withColor(
+                      Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  );
+                }),
                 const SizedBox(height: AppSpacing.xl),
 
                 // Email

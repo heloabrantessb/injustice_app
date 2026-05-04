@@ -12,15 +12,21 @@ import '../../widgets/date_wheel_picker.dart';
 import '../../widgets/input_text_field.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
-/// Página de criação de personagem
+/// Página de criação ou edição de personagem
 class CharacterCreateView extends StatefulWidget {
-  const CharacterCreateView({super.key});
+  const CharacterCreateView({
+    super.key,
+    this.initialCharacter,
+  });
+
+  final Character? initialCharacter;
 
   @override
   State<CharacterCreateView> createState() => _CharacterCreateViewState();
 }
 
 class _CharacterCreateViewState extends State<CharacterCreateView> {
+  bool get isEditing => widget.initialCharacter != null;
   late final CharactersViewModel _vmCharacters;
   late final void Function() _disposeSuccessEffect;
   late final void Function() _disposeErrorEffect;
@@ -49,6 +55,21 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
     _vmCharacters = injector.get<CharactersViewModel>();
     _vmCharacters.charactersState.clearMessage();
 
+    if (widget.initialCharacter != null) {
+      final character = widget.initialCharacter!;
+      _name = character.name;
+      _characterClass = character.characterClass;
+      _rarity = character.rarity;
+      _alignment = character.alignment;
+      _createdAt = character.createdAt;
+      _level = character.level;
+      _threat = character.threat;
+      _attack = character.attack;
+      _health = character.health;
+      _stars = character.stars;
+      _formFields.name.controller.text = character.name;
+    }
+
     // Listener para atualizar o nome quando o controller mudar
     _formFields.name.controller.addListener(() {
       _name = _formFields.name.controller.text;
@@ -68,7 +89,10 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
     });
 
     _disposeSuccessEffect = effect(() {
-      final result = _vmCharacters.commands.createCharacterCommand.result.value;
+      final command = isEditing
+          ? _vmCharacters.commands.updateCharacterCommand
+          : _vmCharacters.commands.createCharacterCommand;
+      final result = command.result.value;
 
       if (result != null && mounted) {
         result.fold(
@@ -76,8 +100,14 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
 
-              showSnackBar(context, 'Personagem criado com sucesso!', backgroundColor: Colors.green);
-              _vmCharacters.commands.createCharacterCommand.clear();
+              showSnackBar(
+                context,
+                isEditing
+                    ? 'Personagem atualizado com sucesso!'
+                    : 'Personagem criado com sucesso!',
+                backgroundColor: Colors.green,
+              );
+              command.clear();
               context.pop(); // Volta para a lista
             });
           },
@@ -86,7 +116,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
               if (!mounted) return;
 
               showSnackBar(context, failure.msg, backgroundColor: Colors.red);
-              _vmCharacters.commands.createCharacterCommand.clear();
+              command.clear();
             });
           },
         );
@@ -143,8 +173,9 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
   Future<void> _salvarPersonagem() async {
     if (!_validateForm()) return;
 
-    Character newCharacter = Character(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final now = DateTime.now();
+    final character = Character(
+      id: widget.initialCharacter?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
       name: _name.trim(),
       characterClass: _characterClass,
       rarity: _rarity,
@@ -155,10 +186,15 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
       health: _health,
       stars: _stars,
       createdAt: _createdAt,
-      updatedAt: _createdAt,
+      updatedAt: isEditing ? now : _createdAt,
     );
 
-    await _vmCharacters.commands.addCharacter(newCharacter);
+    if (isEditing) {
+      await _vmCharacters.commands.updateCharacter(character);
+    } else {
+      await _vmCharacters.commands.addCharacter(character);
+    }
+
     _resetFormView();
   }
 
@@ -166,7 +202,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Criar Personagem'),
+        title: Text(isEditing ? 'Editar Personagem' : 'Criar Personagem'),
       ),
       drawer: AppDrawer(),
       body: GestureDetector(
@@ -337,7 +373,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
                               ),
                             ),
                           )
-                        : const Text('CRIAR PERSONAGEM'),
+                        : Text(isEditing ? 'ATUALIZAR PERSONAGEM' : 'CRIAR PERSONAGEM'),
                   );
                 }),
                 const SizedBox(height: AppSpacing.xl),
@@ -371,7 +407,7 @@ class _CharacterCreateViewState extends State<CharacterCreateView> {
                 children: [
                   Text(label, style: context.textStyles.labelMedium),
                   DropdownButtonFormField<T>(
-                    value: value,
+                    initialValue: value,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
