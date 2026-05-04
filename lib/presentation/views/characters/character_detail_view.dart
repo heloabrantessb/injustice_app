@@ -13,7 +13,7 @@ class CharacterDetailView extends StatelessWidget {
     super.key,
     required this.character,
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
