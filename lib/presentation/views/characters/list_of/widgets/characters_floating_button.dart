@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../../helper_dev/fakes/character_factory.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../../core/routes/app_routes.dart';
 import '../../../../controllers/characters_view_model.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
@@ -17,9 +18,8 @@ class CharactersFab extends StatelessWidget {
       return FloatingActionButton(
         onPressed: isExecuting
             ? null
-            : () async {
-                final character = CharacterFactory.list(1).first;
-                await viewModel.commands.addCharacter(character);
+            : () {
+                context.push(AppPaths.characterCreate);
               },
         child: isExecuting
             ? const SizedBox(
